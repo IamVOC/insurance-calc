@@ -6,7 +6,9 @@ from .schemas import DailyTariffsRequest, TariffResponse
 from .models import Tariff, MaterialRate
 
 
-async def create_tariff_plans(*, tariffs: DailyTariffsRequest, db: AsyncSession) -> List[TariffResponse]:
+async def create_tariff_plans(
+    *, tariffs: DailyTariffsRequest, db: AsyncSession
+) -> List[TariffResponse]:
     insert_tariffs_stmt = (
         insert(Tariff)
         .values([{"relevance_date": date} for date in tariffs.root.keys()])
@@ -26,6 +28,8 @@ async def create_tariff_plans(*, tariffs: DailyTariffsRequest, db: AsyncSession)
         ]
     )
     await db.execute(insert_rates_stmt)
-    res = [TariffResponse.model_validate(i, from_attributes=True) for i in inserted_tariffs]
+    res = [
+        TariffResponse.model_validate(i, from_attributes=True) for i in inserted_tariffs
+    ]
     await db.commit()
     return res
