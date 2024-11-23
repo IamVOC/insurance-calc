@@ -11,6 +11,8 @@ FROM python:3.11-alpine
 WORKDIR /app
 
 COPY --from=builder /app /app
+COPY ./alembic.ini .
+COPY ./alembic/ ./alembic
 COPY ./src ./src
 ENV PYTHONPATH="/app"
 

@@ -20,6 +20,7 @@ services:
       start_period: 10s
     restart: unless-stopped
   insurance-microservice:
+    container_name: insurance-microservice
     image: insurance-microservice:latest
     environment:
       - DB_HOST
