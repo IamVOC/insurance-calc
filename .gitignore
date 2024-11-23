@@ -23,6 +23,7 @@ cover/
 
 # Environments
 .env
+.test.env
 .venv
 env/
 venv/
