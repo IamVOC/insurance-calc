@@ -7,7 +7,7 @@ on:
 jobs:
   lint-check:
     name: lint-check
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     environment: test_environment
     services:      
       postgres:
