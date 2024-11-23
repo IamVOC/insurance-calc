@@ -12,7 +12,9 @@ async def test_calculate_insurance(session):
     data = {"cargo_type": "Glass", "declared_cost": 100, "cargo_date": date(2020, 1, 1)}
     cargo = CargoRequest.model_validate(data)
     raw_res = await session.execute(
-        insert(Tariff).values([{"relevance_date": date(2020,1,1)}]).returning(Tariff.id)
+        insert(Tariff)
+        .values([{"relevance_date": date(2020, 1, 1)}])
+        .returning(Tariff.id)
     )
     tariff_id = raw_res.scalar()
     await session.execute(
@@ -26,6 +28,7 @@ async def test_calculate_insurance(session):
     assert insurance
     assert insurance.insurance_amount == 30
 
+
 @pytest.mark.asyncio
 async def test_insurance_tariff_nf(session):
     data = {"cargo_type": "Glass", "declared_cost": 100, "cargo_date": date(2020, 1, 1)}
@@ -34,4 +37,3 @@ async def test_insurance_tariff_nf(session):
     insurance = await calculate_insurance(cargo=cargo, db=session)
 
     assert insurance is None
-

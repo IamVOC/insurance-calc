@@ -11,6 +11,7 @@ from tests.conftest import test_session
 from tests.conftest import async_engine, TestingAsyncSessionLocal
 from src.tariff.models import Tariff, MaterialRate
 
+
 @pytest_asyncio.fixture
 async def client() -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides[get_db] = test_session
@@ -35,7 +36,9 @@ async def test_insurance_session():
             nested = connection.sync_connection.begin_nested()
 
     raw_res = await async_session.execute(
-        insert(Tariff).values([{"relevance_date": date(2020,1,1)}]).returning(Tariff.id)
+        insert(Tariff)
+        .values([{"relevance_date": date(2020, 1, 1)}])
+        .returning(Tariff.id)
     )
     tariff_id = raw_res.scalar()
     await async_session.execute(
