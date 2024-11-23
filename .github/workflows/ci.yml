@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+
+
+jobs:
+  lint-check:
+    name: lint-check
+    runs-on: self-hosted
+    environment: test_environment
+    services:      
+      postgres:
+        image: postgres:16.3-alpine3.20
+        env:
+          POSTGRES_PASSWORD: ${{ vars.DB_PASS }}
+          POSTGRES_USER: ${{ vars.DB_USER }}
+          POSTGRES_DB: ${{ vars.DB_NAME }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Setup poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.8.3
+      - name: Checking
+        run: ls
+      - name: Add dotenv
+        uses: mravselj/envfile@v1
+        with:
+          secrets: ${{ toJSON(vars) }}
+          file: .env
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+      - name: Install deps
+        run: poetry install
+      - name: Test project
+        run: poetry run pytest --cov=src .
+      - name: Ruff check
+        run: poetry run ruff check --config pyproject.toml
