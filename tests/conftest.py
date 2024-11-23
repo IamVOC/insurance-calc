@@ -1,6 +1,7 @@
 import pytest
 import pytest_asyncio
 
+import asyncio
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import event
@@ -8,6 +9,12 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from src.config import Config as Settings
 
+@pytest.fixture(scope='session')
+def event_loop():
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    yield loop
+    loop.close()
 
 async_engine = create_async_engine(
     Settings(_env_file=".test.env").DB.URL, pool_size=10, echo=True, max_overflow=10
