@@ -3,6 +3,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from src.constants import Environment
 
 
+class KafkaConfig(BaseSettings):
+    HOST: str
+    PORT: int
+    TOPIC: str
+
+    @property
+    def BOOTSTRAP_SERVER(self) -> str:
+        return f"{self.HOST}:{self.PORT}"
+
+
 class DBConfig(BaseSettings):
     HOST: str
     PORT: int
@@ -27,6 +37,7 @@ class Config(BaseSettings):
     ENVIRONMENT: Environment = Environment.production
 
     DB: DBConfig
+    KAFKA: KafkaConfig
 
 
 settings = Config()
