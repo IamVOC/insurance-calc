@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert
+from sqlalchemy import delete, insert, update, and_
 
-from .schemas import DailyTariffsRequest, TariffResponse
+from .schemas import DailyTariffsRequest, MaterialTariff, TariffResponse
 from .models import Tariff, MaterialRate
 
 
@@ -33,3 +33,37 @@ async def create_tariff_plans(
     ]
     await db.commit()
     return res
+
+
+async def update_tariff_plans(
+    *, tariff_id: int, rates: List[MaterialTariff], db: AsyncSession
+) -> List[MaterialRate]:
+    res = []
+    for rate in rates:
+        stmt = (
+            update(MaterialRate)
+            .where(
+                and_(
+                    MaterialRate.tariff_id == tariff_id,
+                    MaterialRate.material_type == rate.material_type,
+                )
+            )
+            .values(rate=rate.rate)
+            .returning(MaterialRate)
+        )
+        ret = await db.execute(stmt)
+        sc = ret.scalar()
+        if sc:
+            res.append(sc)
+    await db.commit()
+    return res
+
+
+async def delete_tariff_plans(*, tariff_id: int, db: AsyncSession) -> Optional[TariffResponse]:
+    stmt = delete(Tariff).where(Tariff.id == tariff_id).returning(Tariff)
+    ret = await db.execute(stmt)
+    tariff = ret.scalar()
+    res = TariffResponse.model_validate(tariff, from_attributes=True) if tariff else None
+    await db.commit()
+    if res:
+        return res
