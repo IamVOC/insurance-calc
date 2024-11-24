@@ -22,7 +22,7 @@ def upgrade() -> None:
     op.create_table(
         "tariffs",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("relevance_date", sa.Date(), nullable=False),
+        sa.Column("relevance_date", sa.Date(), nullable=False, unique=True),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(
@@ -34,10 +34,7 @@ def upgrade() -> None:
         sa.Column("material_type", sa.String(), nullable=False),
         sa.Column("rate", sa.Float(), nullable=False),
         sa.Column("tariff_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["tariff_id"],
-            ["tariffs.id"],
-        ),
+        sa.ForeignKeyConstraint(["tariff_id"], ["tariffs.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(
