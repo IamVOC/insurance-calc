@@ -49,6 +49,12 @@ Guideline for:
   - DB_NAME: Name of your database
   - DB_PASS: User password
 
+- Variables for Kafka:
+
+  - KAFKA_HOST: Host of Kafka
+  - KAFKA_PORT: Port of Kafka
+  - KAFKA_TOPIC: Topic in Kafka
+
 - Variables for environment
   - ENVIRONMENT: Type of your environment
 	  - local - on your machine
